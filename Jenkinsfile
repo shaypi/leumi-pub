@@ -126,12 +126,10 @@ pipeline {
         stage('Terraform Apply/Destroy') {
             steps {
                 dir('terraform/environments/leumi') {
-                    sh '''
-                        terraform validate
-                        terraform fmt
-                        terraform init -backend-config=backend.conf
-                        terraform apply -var-file="main.tfvars" -auto-approve
-                    '''
+                    script {
+                        def terraformCommand = "terraform ${params.CONDITION} -var-file=main.tfvars -auto-approve"
+                        sh terraformCommand
+                    }
                 }
             }
             post {
