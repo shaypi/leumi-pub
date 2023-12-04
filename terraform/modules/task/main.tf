@@ -84,29 +84,6 @@ resource "aws_iam_policy" "api_gateway_policy" {
     ],
   })
 }
-
-resource "aws_iam_policy" "api_gateway_additional_permissions_policy" {
-  name        = "api_gateway_additional_permissions_policy"
-  description = "Policy for additional API Gateway permissions"
-
-  policy = jsonencode({
-    Version = "2012-10-17",
-    Statement = [
-      {
-        Action   = [
-          "apigateway:GET",
-          "apigateway:POST",
-          "apigateway:PUT",
-          "apigateway:DELETE",
-          "apigateway:PATCH",
-        ],
-        Effect   = "Allow",
-        Resource = aws_api_gateway_rest_api.leumi.arn,
-      },
-    ],
-  })
-}
-
 resource "aws_iam_role_policy_attachment" "lambda_s3_write_policy" {
   policy_arn = aws_iam_policy.s3_write_policy.arn
   role       = aws_iam_role.lambda_role.name
@@ -117,10 +94,6 @@ resource "aws_iam_role_policy_attachment" "api_gateway_lambda_policy" {
   role       = aws_iam_role.api_gateway_role.name
 }
 
-resource "aws_iam_role_policy_attachment" "api_gateway_policy" {
-  policy_arn = aws_iam_policy.api_gateway_additional_permissions_policy.arn
-  role       = aws_iam_role.api_gateway_role.name
-}
 resource "aws_lambda_function" "leumi" {
   function_name    = var.project
   handler          = "lambda_function.lambda_handler"
@@ -186,7 +159,7 @@ resource "aws_api_gateway_integration" "leumi_integration" {
 resource "aws_api_gateway_method" "leumi_method" {
   rest_api_id    = aws_api_gateway_rest_api.leumi.id
   resource_id    = aws_api_gateway_resource.leumi_resource.id
-  http_method    = "POST"
+  http_method    = "GET"
   authorization  = "NONE"
 }
 
